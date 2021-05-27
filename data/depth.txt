@@ -1,0 +1,5 @@
+category	a	b	c
+cont	0	2.6	2.6
+dispersed	34.2	5.3	2.6
+scatter	57.9	7.9	7.9
+isolated	55.3	7.9	5.3

@@ -1,0 +1,89 @@
+---
+title: "Thickets habitat"
+author: "Stephanie Martinez"
+date: "23/3/2021"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Bar plots and Chi-square test for thicket morphology in relation to wind and wave exposure, and depth
+
+Load packages and data
+
+```{r}
+library(ggplot2)
+library(reshape2)
+library(RColorBrewer)
+library(Rmisc)
+library(extrafont)
+library(dplyr)
+library(tidyr)
+```
+
+Check fonts from package extrafont
+
+```{r}
+fonts()    
+```
+
+Data
+
+```{r}
+exposure <- read.delim(file="data/exposure.txt")
+depth <- read.delim(file="data/depth.txt")
+
+```
+
+### Exposure plots
+
+```{r}
+
+exp2 <- exposure %>% 
+  pivot_longer(c(leew, wind),names_to = "group",values_to = "value") 
+
+
+p1 <- ggplot(exp2, aes(x=category, y=value, fill=group)) + 
+  geom_bar(stat="identity", 
+           position=position_dodge()) +
+  theme_scientific()+
+   scale_fill_manual(breaks=c("leew", "wind"),
+                    values=c("#44AA99","#117733"),
+                    labels = c("leew"="Leeward","wind"="Windward")) +
+  scale_x_discrete(limits=morph,labels=c("cont"="Continuous","dispersed"="Dispersed","scatter"="Scatter","isolated"="Isolated"))+
+  theme(legend.title = element_blank()) +
+  labs(x="", y="Frequency (%)")+
+  theme(legend.position = "bottom",legend.title = element_blank())
+p1
+
+```
+
+### Depth plots
+
+```{r}
+depth2 <- depth %>% 
+  pivot_longer(c(a, b, c),names_to = "depth",values_to = "value") 
+
+
+p2 <- ggplot(depth2, aes(x=category, y=value, fill=depth)) + 
+  geom_bar(stat="identity", 
+           position=position_dodge()) +
+  theme_scientific()+
+  scale_fill_manual(breaks=c("a", "b", "c"),
+                    values=c("#33BBEE","#0077BB","#004488"),
+                    labels = c("a"="0-5m","b"="6-10m","c"="11-15m")) +
+  scale_x_discrete(limits=morph,labels=c("cont"="Continuous","dispersed"="Dispersed","scatter"="Scatter","isolated"="Isolated"))+
+  theme(legend.title = element_blank()) +
+  labs(x="", y="Frequency (%)")+
+  theme(legend.position = "bottom",legend.title = element_blank())
+p2
+
+p1 + p2
+
+```
+
+### Chi-square test

@@ -1,0 +1,3 @@
+stakeh	yes_f	yes_p	no_f	no_p	no_answerf	no_answerp
+Fisher	24	55,81395349	19	44,18604651	0	0
+Homestay	3	13,04347826	8	34,7826087	12	52,17391304

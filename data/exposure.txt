@@ -1,0 +1,5 @@
+category	leew	wind
+cont	2.6	2.6
+dispersed	28.9	13.2
+scatter	47.4	23.7
+isolated	42.1	26.3

@@ -1,0 +1,160 @@
+---
+title: "Mosaics: A. cervicornis and ticket community"
+author: "Stephanie Martinez"
+date: "10/3/2021"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+# Benthic community and health factors of the mosaics
+
+```{r}
+library(ggplot2)
+library(dplyr)
+library(ggpubr)
+library(artyfarty)
+library(patchwork)
+library(tidyr)
+library(tibble)
+library(magrittr)
+library(viridis)
+library(grafify)
+
+
+```
+
+### Data
+
+```{r}
+cover <- read.csv("data/cover_groups.csv", sep = ";",dec = ".")  %>% 
+  slice(.,-(9:10)) %>%  #remove BQV (onlt 2 transects)
+  mutate(site = factor(site,levels = c("HDMS","IF","CAN", "IL", "ESP","NOR", "VEN", "RAB", "MAD", "BM1", "BM2")))  #mutate to reorder locations to match map coordinates
+  
+  
+wbd <- read.csv("data/wbd.csv", sep = ";", dec = ".") %>% 
+  mutate(site = factor(site,levels = c("HDMS","IF","CAN", "IL", "ESP","NOR", "VEN", "RAB", "MAD", "BM1", "BM2"))) #mutate to reorder locations to match map coordinates
+```
+
+## Benthic community
+
+### Stacked barplot of benthic community
+
+```{r}
+# Merging dead coral categories  and deleting minor categories 
+
+cover2 <- cover %>% 
+  mutate(dead_ac=rdead_ac+odead_ac) %>% 
+  select(-rdead_ac, -odead_ac, - other, -cyano, -millepora)
+
+#Reshaping data frame for stacked plot
+
+cover_mean <-  aggregate(cover2[, 3:12], list(cover2$site),mean) %>% 
+  pivot_longer(scleractinian:dead_ac, names_to = "group",values_to = "cover") %>% 
+  rename(site=Group.1) 
+
+# Invert abiotic groups so they are below y=0
+
+cover_mean2<- cover_mean %>%
+  mutate(coverInv = ifelse(group == "sand" | group == "dead_ac" | group == "rubble", -1*cover, cover))
+
+cover_mean2$group <- as.factor(cover_mean2$group) #to be able to order groups in each bar
+ 
+# Plot
+
+p1 <- ggplot(cover_mean2) +
+  geom_bar(position="stack", stat="identity", 
+           aes(fill=factor(group,levels=c("sponge", "octocoral","halimeda", 
+                                          "turf.algae", "algae",
+                                          "scleractinian", "cervicornis", 
+                                          "dead_ac", "rubble", "sand")), #Group order inside each bar
+               y=coverInv, x=site)) +
+  scale_fill_manual(values = c("#AA4499","#882255","#CC6677","#117733",
+                               "#44AA99","#0077BB","#332288",
+                               "#26272C","#4C4E57","#A8AAB3"),
+                    labels = c("Sponge", "Octocoral","Halimeda",
+                               "Turf algae","Macroalgae","Scleractinian",
+                               "A. cervicornis", "Dead coral","Rubble","Sand")) +
+  theme_scientific()+
+  theme(legend.title = element_blank()) +
+  labs(x="", y="Cover (%)")+
+  scale_y_continuous(breaks = pretty(cover_mean2$coverInv),
+                     labels = abs(pretty(cover_mean2$coverInv)))
+  
+p1
+
+ggsave(p1, filename = "figures/thicket_comm.pdf")
+
+```
+
+## *A. cervicornis* live cover, recent and dead mortality comparison
+
+Formatting data frames for barplots
+
+```{r}
+
+cervi <- cover %>% 
+  select(site, transect, cervicornis, rdead_ac, odead_ac)
+
+cervi_mean <- aggregate(cervi[, 3:5], list(cervi$site),mean) %>% 
+  pivot_longer(c(cervicornis, rdead_ac, odead_ac),names_to = "group",values_to = "mean") 
+cervi_sd <- aggregate(cervi[, 3:5], list(cervi$site),sd) %>% 
+  pivot_longer(c(cervicornis, rdead_ac, odead_ac),names_to = "group",values_to = "sd") %>% 
+  select(-Group.1, -group)
+  
+cervi2 <- bind_cols(cervi_mean, cervi_sd) %>% #merging mean and sd in one df
+  rename(site = Group.1) %>% 
+  slice(-(7:9)) %>% 
+  mutate(site = factor(site,levels = c("HDMS","IF","CAN", "IL", "ESP","NOR", "VEN", "RAB", "MAD", "BM1", "BM2"))) #mutate to reorder locations to match map coordinates
+```
+
+Barplot: A. cervicornis live cover, recent and old mortality
+
+```{r}
+
+p2 <- ggplot(cervi2, aes(x=site, y=mean, fill=group)) + 
+  geom_bar(stat="identity", color="black", 
+           position=position_dodge()) +
+  geom_errorbar(aes(ymin=mean, ymax=mean+sd), width=.2,
+                 position=position_dodge(.9)) +
+  theme_scientific()+
+  scale_fill_grafify(palette = "muted",
+                    labels = c("Live cover", "Old mortality", "Recent mortality")) +
+  theme(legend.title = element_blank(), legend.position="bottom",plot.title = element_text(hjust = 0)) +
+  labs(x="", y="Cover (%)", title="a)")
+p2
+
+#White band disease boxplot
+
+p3 <- ggboxplot(wbd, x = "site", y = "freq", xlab="", ylab="WBD frequency (%)", title = "b)")+
+  theme_scientific()+
+  theme(plot.title = element_text(hjust = 0))
+p3  
+
+#Composing plots
+
+p4 <- p2/p3
+
+ggsave(p4, filename = "figures/thicket_status.pdf")
+```
+
+### White band disease (wbd) boxplots
+
+```{r}
+
+p3 <- ggboxplot(wbd, x = "site", y = "freq", xlab="", ylab="WBD frequency (%)", title = "b)")+
+  theme_scientific()+
+  theme(plot.title = element_text(hjust = 0))
+p3  
+
+#Composing plots
+
+p4 <- p2/p3
+
+ggsave(p4, filename = "figures/thicket_status.pdf")
+
+```
+
+## Statistics
+
+Permanova for WBD

@@ -1,0 +1,11 @@
+stakeholder	question	answer	frequency	percentage
+fisher	funct	yes	14	32,55813953
+fisher	funct	no	29	67,44186047
+fisher	changes	yes	24	55,81395349
+fisher	changes	no	19	44,18604651
+fisher	changes	no_answer	0	0
+homestay	funct	yes	20	86,95652174
+homestay	funct	no	3	13,04347826
+homestay	changes	yes	3	13,04347826
+homestay	changes	no	8	34,7826087
+homestay	changes	no_answer	12	52,17391304
