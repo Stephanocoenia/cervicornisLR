@@ -1,0 +1,6 @@
+variable 	Continuous	Scatter	Isolated
+depth_a	13	22	21
+depth_b	3	3	3
+depth_c	2	3	2
+leeward	12	18	16
+windward	6	9	10
