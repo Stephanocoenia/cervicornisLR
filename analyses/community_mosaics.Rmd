@@ -18,7 +18,6 @@ library(patchwork)
 library(tidyr)
 library(tibble)
 library(magrittr)
-library(viridis)
 library(grafify)
 library(vegan) #PERMNANOVA and SIMPER
 library(purrr) #map function
@@ -165,7 +164,7 @@ sim_sector_sum <- summary(sim_sector,ordered=TRUE)
 sim_site <- simper(cover[,c(4:17)],cover$site)
 sim_site_sum <- summary(sim_site,ordered=TRUE)
 
-# Selecting the first 5 groups that contributed more to the dissimilarity between sites. The top 5 groups were selected since in most cases these accounted for at least 70% of the dissimilarities. 
+# Selecting the first 5 groups that contributed more to the dissimilarity between sites to determine which groups contributed more frequently to dissimilarities between sectors and sites. The top 5 groups were selected since in most cases these accounted for at least 70% of the dissimilarities. 
 
 #sector
 map(sim_sector_sum,function(x){
@@ -294,3 +293,32 @@ gtsave(filename = "figures/wbd_permanova.png",  data = table_wbd)
 
 
 ```
+
+
+Uploading and formatting DISTLM table (analysis donde using Primer 6+)
+
+```{r}
+
+distlm <- read.csv("data/distlm.csv",sep = ";",dec = "." ) %>% 
+  as.data.frame() %>% 
+  gt() %>% 
+  cols_label(
+    Variable = md("**Variable**"),
+    SS.trace. = md("**Sum Squares**"),
+    Pseudo.F = md("**Pseudo-F**"),
+    P = md("**p-value**"),
+    Prop = md("**Prop**")
+  ) %>% 
+  cols_align(align = "center", columns = c("SS.trace.", "Pseudo.F","P","Prop")
+  ) 
+
+distlm
+
+gtsave(filename = "figures/distlm.tex", data = distlm)
+gtsave(filename = "figures/distlm.png",  data = distlm)
+
+```
+
+
+
+
