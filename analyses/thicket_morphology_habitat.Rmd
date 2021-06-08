@@ -11,7 +11,7 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Bar plots and Chi-square test for thicket morphology in relation to wind and wave exposure, and depth
+## Bar plots and Fisher's exact test for thicket morphology in relation to wind and wave exposure, and depth
 
 Load packages and data
 
@@ -86,4 +86,4 @@ p1 + p2
 
 ```
 
-### Chi-square test
+
