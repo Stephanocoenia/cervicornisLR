@@ -182,7 +182,7 @@ map(sim_sector_sum,function(x){
   
 
 # site
-map(sim_site_sum,function(x){
+simper_freq <- map(sim_site_sum,function(x){
   slice(x,c(1:5)) %>% 
     rownames_to_column("group") %>% 
     select(group)
@@ -195,6 +195,8 @@ map(sim_site_sum,function(x){
   arrange(desc(Freq)) %>% 
   mutate(Freq_p=round((Freq/55)*100,1)) #Divide freq by number of lists
   
+simper_freq
+
 
 ```
 
@@ -256,6 +258,25 @@ gtsave(filename = "figures/community_permanova.png",  data = table_permanova)
 
 
 ```
+
+SIMPER frequencies table
+
+```{r}
+
+table_simper <- simper_freq %>%
+  gt() %>% 
+  cols_label(
+    group = md("**Variable**"),
+    Freq = md("**Frequency**"),
+    Freq_p = md("**(%)**"),
+   ) %>% 
+  cols_align(align = "center", columns = c("Freq","Freq_p"))
+  
+gtsave(filename = "figures/simper_summary.tex", data = table_simper)
+
+```
+
+
 
 WBD permanova table
 
